@@ -22,7 +22,8 @@
 		},
 
 		to : function ( define ) { 
-			var request
+			var request, self
+			self      = this
 			request   = new XMLHttpRequest()
 			define.do = define.do || "get"
 			request.onreadystatechange = function () { 
@@ -73,16 +74,25 @@
 		},
 
 		convert_url_and_data_to_full_url : function ( from ) {
-
-			if ( from.data.constructor === String ) {
-				return from.url +"?data="+ window.encodeURIComponent( from.data )
-			}
-
-			if ( from.data.constructor === Array || from.data.constructor === Object ) {
-				if ( from.flat ) { 
-
+			var url, final_url
+			// should have a method for checking url validity here before its used
+			url = from.url
+			if ( from.data ) {
+				if ( from.data.constructor === String ) {
+					final_url = url + "?data="+ window.encodeURIComponent( from.data )
 				}
+
+				if ( from.data.constructor === Array || from.data.constructor === Object ) {
+					if ( from.flat ) { 
+						final_url = url +"?"+ this.convert_array_or_object_to_flat_uri_paramaters( from.data )
+					} else { 
+						final_url = url +"?data="+ window.encodeURIComponent( JSON.stringify( from.data ) )
+					}
+				}
+			} else { 
+				final_url = url
 			}
+			return final_url
 		},
 
 		convert_array_or_object_to_flat_uri_paramaters : function ( data ) { 
@@ -103,6 +113,18 @@
 					"subject" : data,
 					"into?"   : "",
 					"else_do" : function ( loop ) {
+						var and, key, value
+						and   = ( loop.index > 0 ? "&" : "" )
+						key   = loop.key
+						value = loop.value
+						if ( loop.value.constructor === Object ) { 
+
+						} 
+
+						if () { 
+
+						}
+						
 						return {
 							into : ( loop.index > 0 ?
 								loop.into +"&"+ loop.key +"="+ loop.value :
@@ -115,7 +137,10 @@
 		},
 
 		convert_response_text : function ( convert ) { 
-
+			if ( convert.to === "json" && convert.text.constructor === String ) {
+				return JSON.parse( convert.text )
+			}
+			return convert.text
 		},
 
 		convert_object_to_uri_string : function () { 

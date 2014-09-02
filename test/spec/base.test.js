@@ -5,15 +5,17 @@ describe("request", function() {
 	module.library = {
 		morph : window.morph
 	}
-	beforeEach(function () { 
-		jasmine.Ajax.install()
-	})
-
-	afterEach(function () { 
-		jasmine.Ajax.uninstall()
-	})
 
 	describe("to", function() {
+
+		beforeEach(function () { 
+			jasmine.Ajax.install()
+		})
+
+		afterEach(function () { 
+			jasmine.Ajax.uninstall()
+		})
+
 		var definition, spy
 		spy        = {
 			opened    : function () {
@@ -51,22 +53,87 @@ describe("request", function() {
 				},
 				loading   : function () {},
 				finished  : function ( state ) {
-					spy.finished({
-
-					})
+					spy.finished( state.result )
 				},
-				sucessful : function () {},
+				sucessful : function () {
+
+				},
 				aborted   : function () {},
 			},
 			expect : "json"
 		}
 
-		spyOn( definition.when, "opened" )
-		spyOn( definition.when, "sent" )
-		spyOn( definition.when, "finished" )
+		spyOn( spy, "opened" )
+		spyOn( spy, "sent" )
+		spyOn( spy, "finished" )
 
-		jasmine.Ajax.stubRequest("some/basic").andReturn({
-			"responseText" : "string string"
+		it("calls finished with the correct paramaters", function() {
+
+			jasmine.Ajax.stubRequest("some/basic").andReturn({
+				"responseText" : JSON.stringify({
+					s : "some"
+				})
+			})
+
+			module.to(definition)
+
+			expect(spy.finished).toHaveBeenCalledWith({ s : "some" })
+		})
+	})
+
+	describe("convert url and data to full url", function() {
+		
+		it("converts a plain url", function() {
+			expect(module.convert_url_and_data_to_full_url({
+				url : "some/some",
+			})).toEqual("some/some")
+		})
+
+		it("converts a url with object data", function() {
+			var result
+			result = module.convert_url_and_data_to_full_url({
+				url  : "some/some",
+				data : {
+					"s" : "some"	
+				}
+			})
+			expect( JSON.parse( window.decodeURIComponent( result.split("data=")[1] ) ) ).toEqual({
+				"s" : "some"
+			})
+		})
+
+		it("converts a url with array data", function() {
+			var result
+			result = module.convert_url_and_data_to_full_url({
+				url  : "some/some",
+				data : ["some", "some"]
+			})
+			expect( JSON.parse( window.decodeURIComponent( result.split("data=")[1] ) ) ).toEqual(["some", "some"])
+		})
+
+		it("converts a url with flat array data", function() {
+			var result
+			result = module.convert_url_and_data_to_full_url({
+				url  : "some/some",
+				data : ["some", "some"],
+				flat : true
+			})
+			expect(result).toEqual("some/some?0=some&1=some")
+		})
+
+		it("converts a url with flat object data", function() {
+			var result
+			result = module.convert_url_and_data_to_full_url({
+				url  : "some/some",
+				data : {
+					s : "some",
+					d : "some",
+					b : ["some", "some"],
+					c : { b : "s" }
+				},
+				flat : true
+			})
+			// expect(result).toEqual("some/some?0=some&1=some")
 		})
 	})
 
@@ -96,6 +163,20 @@ describe("request", function() {
 					another : "value"
 				})
 			).toEqual("some=value&another=value")
+
+			expect(
+				decodeURI( module.convert_array_or_object_to_flat_uri_paramaters({
+					some    : "value v",
+					another : "value b"
+				}))
+			).toEqual("some=value v&another=value b")
+
+			console.log( module.convert_array_or_object_to_flat_uri_paramaters({
+				s : "some",
+				d : "some",
+				b : ["some", "some"],
+				c : { b : "s" }
+			}) )
 		})
 	})
 
