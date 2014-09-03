@@ -1,7 +1,9 @@
 define({
 	// style: "",
-	name    : "main",
-	main    : "main",
+	name    : "transit",
+	main    : "transit",
 	module  : [],
-	package : []
+	package : [
+		"library/morph"
+	]
 })
