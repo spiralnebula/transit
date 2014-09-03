@@ -69,7 +69,13 @@
 					}
 				}
 			}
-			request.open( define.do, define.url )
+			request.open( 
+				define.do, 
+				this.convert_url_and_data_to_full_url({
+					url  : define.url,
+					data : define.data || false
+				})
+			)
 			request.send()
 		},
 
@@ -102,34 +108,40 @@
 					subject : data,
 					into    : "",
 					else_do : function ( loop ) {
-						var prefix = ( loop.index > 0 ? "&" : "" )
-						return loop.into + prefix + loop.index +"="+ window.encodeURIComponent( loop.indexed )
+						var value, prefix
+						value  = loop.indexed
+						prefix = ( loop.index > 0 ? "&" : "" )
+						if ( 
+							loop.indexed.constructor === Object ||
+							loop.indexed.constructor === Array
+						) { 
+							value = JSON.stringify( loop.indexed )
+						}
+						return loop.into + prefix + loop.index +"="+ window.encodeURIComponent( value )
 					}
 				})
 			}
 
 			if ( data.constructor === Object ) {
+				// console.log( data )
 				return this.library.morph.object_loop({
 					"subject" : data,
 					"into?"   : "",
 					"else_do" : function ( loop ) {
+						// console.log( loop.value )
 						var and, key, value
 						and   = ( loop.index > 0 ? "&" : "" )
 						key   = loop.key
 						value = loop.value
-						if ( loop.value.constructor === Object ) { 
-
-						} 
-
-						if () { 
-
+						if ( 
+							loop.value.constructor === Object || 
+							loop.value.constructor === Array
+						) {
+							value = JSON.stringify( loop.value )
 						}
-						
+
 						return {
-							into : ( loop.index > 0 ?
-								loop.into +"&"+ loop.key +"="+ loop.value :
-								loop.into + loop.key +"="+ loop.value 
-							)
+							into : loop.into + and + key +"="+ window.encodeURIComponent( value )
 						}
 					}
 				})	

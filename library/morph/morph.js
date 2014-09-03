@@ -307,13 +307,21 @@
   		},
 
   		get_the_values_of_an_object : function ( object ) { 
+  			
   			var keys
   			keys = []
   			for ( var property in object ) { 
-  				if ( object.hasOwnProperty( property ) ) { 
-  					keys = keys.concat( object[property] )
+  				if ( object.hasOwnProperty( property ) ) {
+  					var value
+  					value = object[property]
+  					if ( value.constructor === Array ) {
+  						keys = keys.concat([ value ])
+  					} else { 
+  						keys = keys.concat( value )
+  					}
   				}
   			}
+
   			return keys
   		},
 
@@ -444,7 +452,6 @@
 			self  = this
 			key   = this.get_the_keys_of_an_object( loop.subject )
 			value = this.get_the_values_of_an_object( loop.subject )
-
 			return this.base_loop({
 				length       : key.length,
 				index        : 0,

@@ -487,6 +487,12 @@
 				d : 2
 			})).toEqual([1,2])
 		})
+		it("gets arrays rather than joining them into one", function() {
+			expect(module.get_the_values_of_an_object({
+				s : [1,2,3],
+				d : 2
+			})).toEqual([ [1,2,3], 2 ])
+		})
 	})
 
 	describe("get the keys of an object", function() {

@@ -85,7 +85,7 @@ describe("request", function() {
 		
 		it("converts a plain url", function() {
 			expect(module.convert_url_and_data_to_full_url({
-				url : "some/some",
+				url  : "some/some",// data : {}
 			})).toEqual("some/some")
 		})
 
@@ -156,6 +156,21 @@ describe("request", function() {
 			).toEqual("0=some some&1=value value&2=there there")
 		})
 
+		it("convets arrays with multuple value types", function() {
+			var split_result, result
+			result = module.convert_array_or_object_to_flat_uri_paramaters([
+				"some",
+				"some",
+				["some", "some"],
+				{ b : "s" }
+			])
+			split_result = result.split("&")
+			expect(window.decodeURIComponent( split_result[0] )).toEqual("0=some")
+			expect(window.decodeURIComponent( split_result[1] )).toEqual("1=some")
+			expect(window.decodeURIComponent( split_result[2] )).toEqual('2=["some","some"]')
+			expect(window.decodeURIComponent( split_result[3] )).toEqual('3={"b":"s"}')
+		})
+
 		it("converts object", function() {
 			expect(
 				module.convert_array_or_object_to_flat_uri_paramaters({
@@ -170,13 +185,21 @@ describe("request", function() {
 					another : "value b"
 				}))
 			).toEqual("some=value v&another=value b")
+		})
 
-			console.log( module.convert_array_or_object_to_flat_uri_paramaters({
+		it("convets objects with multuple value types", function() {
+			var split_result, result
+			result = module.convert_array_or_object_to_flat_uri_paramaters({
 				s : "some",
 				d : "some",
 				b : ["some", "some"],
 				c : { b : "s" }
-			}) )
+			})
+			split_result = result.split("&")
+			expect(window.decodeURIComponent( split_result[0] )).toEqual("s=some")
+			expect(window.decodeURIComponent( split_result[1] )).toEqual("d=some")
+			expect(window.decodeURIComponent( split_result[2] )).toEqual('b=["some","some"]')
+			expect(window.decodeURIComponent( split_result[3] )).toEqual('c={"b":"s"}')
 		})
 	})
 
