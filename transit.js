@@ -69,14 +69,16 @@
 					}
 				}
 			}
+
 			request.open( 
 				define.do, 
 				this.convert_url_and_data_to_full_url({
 					url  : define.url,
-					data : define.data || false
+					data : define.with || false,
+					flat : define.flat || false
 				})
 			)
-			request.send()
+			request.send(null)
 		},
 
 		convert_url_and_data_to_full_url : function ( from ) {
@@ -148,7 +150,7 @@
 			}
 		},
 
-		convert_response_text : function ( convert ) { 
+		convert_response_text : function ( convert ) {
 			if ( convert.to === "json" && convert.text.constructor === String ) {
 				return JSON.parse( convert.text )
 			}
