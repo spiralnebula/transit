@@ -1,7 +1,9 @@
 define({
-	main   : "main",
+	main   : "make",
 	module : [
 		"get",
-		"nebula"
+		"nebula",
+		"sort",
+		"configuration_sort"
 	]
 })
